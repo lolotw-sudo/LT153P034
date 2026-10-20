@@ -525,7 +525,7 @@
         case 's': snapshot(); break;
         case 'c': Ceremony.open(rows); break;
         case '1': switchView('solo'); break;
-        case '2': switchView('team'); break;
+        case '2': switchView('schedule'); break;
         case '3': switchView('log'); break;
         case '4': switchView('quiz'); break;
         case '5': switchView('settings'); break;
@@ -547,7 +547,15 @@
     Log.initWall();
     applyLockState();
     refresh();
-    trackView('solo');   // 開頁時畫面本來就停在個人榜，這筆要自己記
+    // 開訓前先讓學員看課程表；開訓當天起自動換回個人榜在前
+    const start = (window.ARENA_CONFIG || {}).courseStart;
+    if (start && Date.now() < new Date(`${start}T00:00:00+08:00`)) {
+      const tab = $('.tab[data-view="schedule"]');
+      tab.parentNode.prepend(tab);
+      switchView('schedule');
+    } else {
+      trackView('solo');   // 開頁時畫面本來就停在個人榜，這筆要自己記
+    }
 
     const st = S();
     if (st.lastSync) setSyncStatus(`上次同步 ${timeStr(st.lastSync)}`, '');
