@@ -20,7 +20,6 @@
 
     UI.setCardData(rows);
     UI.renderBoard(rows, st.options);
-    UI.renderTeams(Scoring.buildTeams(rows));
     UI.renderSnapshots();
 
     $('#className').textContent = st.className || '客網新進人員訓練班第034期';
@@ -236,7 +235,7 @@
 
   /* ── 分頁切換 ─────────────────────────────────────── */
 
-  const VIEW_NAMES = { solo: '個人榜', team: '公會戰', log: '賽季日誌', quiz: '刷題', settings: '設定' };
+  const VIEW_NAMES = { solo: '個人榜', schedule: '課程表', log: '賽季日誌', quiz: '刷題', settings: '設定' };
 
   // 流量統計：每切一次分頁送一筆 page_view。沒設定 Firebase 時 Track 是空殼，什麼都不做。
   const trackView = name => Track('page_view', {
@@ -250,6 +249,7 @@
     if (name === 'settings') applyLockState();
     if (name === 'quiz') Quiz.onEnter();
     if (name === 'log') Log.onEnter();
+    if (name === 'schedule') Log.loadSchedule();
     trackView(name);
   }
 

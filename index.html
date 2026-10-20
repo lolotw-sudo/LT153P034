@@ -6,7 +6,7 @@
 <title>客網新進人員訓練班第034期</title>
 <meta name="description" content="客網新進人員訓練班第034期：實習、活躍度、終極考驗依配分即時排位。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
-<link rel="stylesheet" href="css/style.css?v=20261020a">
+<link rel="stylesheet" href="css/style.css?v=20261020b">
 </head>
 <body>
 
@@ -25,7 +25,7 @@
 
   <nav class="tabs" role="tablist">
     <button class="tab is-active" data-view="solo" role="tab">個人榜</button>
-    <button class="tab" data-view="team" role="tab">公會戰</button>
+    <button class="tab" data-view="schedule" role="tab">課程表</button>
     <button class="tab" data-view="log" role="tab">賽季日誌</button>
     <button class="tab" data-view="quiz" role="tab">刷題</button>
     <button class="tab" data-view="settings" role="tab">設定</button>
@@ -58,14 +58,13 @@
     <p class="board-empty" id="boardEmpty" hidden>尚無資料。到「設定」貼上 Google 試算表連結後按同步。</p>
   </section>
 
-  <!-- ══════════ 公會戰 ══════════ -->
-  <section class="view" id="view-team">
+  <!-- ══════════ 課程表 ══════════ -->
+  <section class="view" id="view-schedule">
     <div class="board-head">
-      <div class="board-title"><h2>公會積分戰</h2><span class="chip" id="teamCount">0 隊</span></div>
-      <p class="hint">公會分數 = 該公會成員的平均得分。在試算表的「組別」欄填上公會名即可自動分組。</p>
+      <div class="board-title"><h2>課程表</h2></div>
+      <p class="hint">整期的課程安排，今天的課會亮起來。</p>
     </div>
-    <div class="team-grid" id="teamGrid"></div>
-    <p class="board-empty" id="teamEmpty" hidden>試算表中沒有「組別」欄位，或所有人都未分組。</p>
+    <div id="scheduleBody"></div>
   </section>
 
   <!-- ══════════ 賽季日誌 ══════════ -->
@@ -331,13 +330,13 @@
   };
 </script>
 
-<script src="js/analytics.js?v=20261020a"></script>
-<script src="js/data.js?v=20261020a"></script>
-<script src="js/effects.js?v=20261020a"></script>
-<script src="js/ui.js?v=20261020a"></script>
-<script src="js/ceremony.js?v=20261020a"></script>
-<script src="js/quiz.js?v=20261020a"></script>
-<script src="js/log.js?v=20261020a"></script>
-<script src="js/app.js?v=20261020a"></script>
+<script src="js/analytics.js?v=20261020b"></script>
+<script src="js/data.js?v=20261020b"></script>
+<script src="js/effects.js?v=20261020b"></script>
+<script src="js/ui.js?v=20261020b"></script>
+<script src="js/ceremony.js?v=20261020b"></script>
+<script src="js/quiz.js?v=20261020b"></script>
+<script src="js/log.js?v=20261020b"></script>
+<script src="js/app.js?v=20261020b"></script>
 </body>
 </html>

@@ -155,7 +155,7 @@ const Log = (() => {
     return { idx, body: rows.slice(1) };
   }
 
-  async function fetchLessons(id) {
+  async function fetchLessons(id, all = false) {
     const tab = await fetchTab(id, cfg().logCourseSheet || '課程表', LESSON_ALIASES, ['topic']);
     if (!tab) return [];
 
@@ -166,7 +166,7 @@ const Log = (() => {
       topic:   val(r, tab.idx.topic),
       teacher: val(r, tab.idx.teacher),
       note:    val(r, tab.idx.note)
-    })).filter(l => l.topic && !isFuture(l.date));
+    })).filter(l => l.topic && (all || !isFuture(l.date)));
   }
 
   async function fetchReports(id) {
@@ -459,12 +459,55 @@ const Log = (() => {
     }
   }
 
+  /* ── 課程表分頁：整期都列（含還沒上的），今天那天亮起來 ── */
+
+  let schedule = null;
+
+  async function loadSchedule() {
+    const body = $('#scheduleBody');
+    const id = Sheet.parseId(cfg().sheetId);
+    if (!body || !id) return;
+    if (!schedule) {
+      body.innerHTML = `<div class="callout">讀取中…</div>`;
+      try {
+        schedule = groupByWeek(await fetchLessons(id, true), [], []);
+      } catch (e) {
+        console.error('[schedule]', e);
+        body.innerHTML = `<div class="callout err">讀取失敗：${esc(e.message)}</div>`;
+        return;
+      }
+    }
+    if (!schedule.length) {
+      body.innerHTML = `<div class="callout">課程表還是空的。到試算表的「課程表」分頁填好課程，再按上面的「同步」。</div>`;
+      return;
+    }
+    const now = new Date(), today = `${now.getMonth() + 1}/${now.getDate()}`;
+    const day = d => `
+      <div class="lg-day${dayKey(d.date) === today ? ' is-today' : isFuture(d.date) ? '' : ' is-past'}">
+        <div class="lg-date">${esc(d.date || '日期未填')}${dayKey(d.date) === today ? ' <span class="chip">今天</span>' : ''}</div>
+        <ul class="lg-lessons">${d.items.map(l => `
+          <li class="lg-lesson"><div class="lg-lesson-head">
+            ${l.time ? `<span class="lg-time">${esc(l.time)}</span>` : ''}
+            <span class="lg-topic">${esc(l.topic)}</span>
+            ${l.teacher ? `<span class="lg-teacher">${esc(l.teacher)}</span>` : ''}
+          </div></li>`).join('')}</ul>
+      </div>`;
+    body.innerHTML = schedule.map(w => `
+      <section class="lg-week">
+        <header class="lg-week-head"><h3>${esc(w.week)}</h3></header>
+        <div class="lg-days">${w.days.map(day).join('')}</div>
+      </section>`).join('');
+  }
+
   /** 進到這個分頁才讀，不佔開場的同步 */
   function onEnter() { initZoom(); load(); }
 
   /** 按「同步」時一起更新；正在看這一頁就當場重畫 */
   function invalidate() {
     cache = null;
+    schedule = null;
+    const sv = document.getElementById('view-schedule');
+    if (sv && sv.classList.contains('is-active')) loadSchedule();
     const view = document.getElementById('view-log');
     if (view && view.classList.contains('is-active')) load();
   }
@@ -479,5 +522,5 @@ const Log = (() => {
     btn.hidden = false;
   }
 
-  return { onEnter, load, invalidate, initWall };
+  return { onEnter, load, invalidate, initWall, loadSchedule };
 })();

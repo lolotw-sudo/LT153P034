@@ -477,6 +477,12 @@ main {
   background: rgba(255,255,255,.05); border: 1px solid var(--stroke);
 }
 
+/* ── 課程表分頁：上過的淡掉，今天的亮起來 ── */
+#scheduleBody .lg-day.is-past { opacity: .5; }
+#scheduleBody .lg-day.is-past::before { background: var(--text-faint); box-shadow: none; }
+#scheduleBody .lg-day.is-today::before { background: var(--gold); box-shadow: 0 0 12px var(--gold); }
+#scheduleBody .lg-day.is-today .lg-date { color: var(--gold); }
+
 /* ── 設定面板 ───────────────────────────────────────── */
 
 .settings-wrap { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
