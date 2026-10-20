@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>客網新進人員訓練班第034期</title>
-<meta name="description" content="客網新進人員訓練班第034期：實習、活躍度、終極考驗依配分即時排位。">
+<meta name="description" content="客網新進人員訓練班第034期：作業、活躍度、終極考驗依配分即時排位。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
-<link rel="stylesheet" href="css/style.css?v=20261020d">
+<link rel="stylesheet" href="css/style.css?v=20261021a">
 </head>
 <body>
 
@@ -137,8 +137,8 @@
           <summary>怎麼設定試算表？（點開看步驟）</summary>
           <ol class="howto-list">
             <li><b>第一個分頁（學員總表）</b>第一列填欄位名稱：
-              <code>座號 · 姓名 · 組別 · 頭像 · 實習1 · 實習2 · 實習3 · 考試成績</code><br>
-              下面每一列填一位學員，成績填 0–100。<b>還沒評的實習留白</b>（不列入平均），
+              <code>座號 · 姓名 · 組別 · 頭像 · 作業1 · 作業2 · 考試成績</code><br>
+              下面每一列填一位學員，成績填 0–100。<b>還沒評的作業留白</b>（不列入平均），
               <b>漏交要填 0</b>——兩者意義不同。</li>
             <li><b>第二個分頁（表現紀錄）</b>記加減分流水帳，第一列填：
               <code>日期 · 堂次 · 學員 · 加減分 · 事由 · 老師</code><br>
@@ -162,11 +162,11 @@
 
       <div class="panel">
         <h3 class="panel-title">⚖️ 學期成績配分</h3>
-        <p class="hint">三項相加就是學期成績的滿分。實習那份由三場實習平分。拉動滑桿，排行榜會當場重新洗牌。</p>
+        <p class="hint">三項相加就是學期成績的滿分。作業那份由兩份作業平分。拉動滑桿，排行榜會當場重新洗牌。</p>
         <p class="hint" id="weightSum"></p>
         <div class="weights" id="weights">
           <div class="weight-row" data-key="quality">
-            <span class="weight-name"><i class="dot dot-q"></i>實習</span>
+            <span class="weight-name"><i class="dot dot-q"></i>作業</span>
             <input type="range" min="0" max="100" step="5" value="30">
             <output>30 分</output>
           </div>
@@ -282,7 +282,7 @@
     // 活躍度的「整期滿分目標」：累計加到這個分數，就拿滿表現那一項的配分
     perfTarget: 50,
 
-    // 各項配分，相加＝學期成績滿分。實習那份由三場實習平分。
+    // 各項配分，相加＝學期成績滿分。作業那份由兩份作業平分。
     weights: { quality: 30, performance: 20, exam: 50 },
 
     // ── 賽季日誌 ──
@@ -334,13 +334,13 @@
   };
 </script>
 
-<script src="js/analytics.js?v=20261020d"></script>
-<script src="js/data.js?v=20261020d"></script>
-<script src="js/effects.js?v=20261020d"></script>
-<script src="js/ui.js?v=20261020d"></script>
-<script src="js/ceremony.js?v=20261020d"></script>
-<script src="js/quiz.js?v=20261020d"></script>
-<script src="js/log.js?v=20261020d"></script>
-<script src="js/app.js?v=20261020d"></script>
+<script src="js/analytics.js?v=20261021a"></script>
+<script src="js/data.js?v=20261021a"></script>
+<script src="js/effects.js?v=20261021a"></script>
+<script src="js/ui.js?v=20261021a"></script>
+<script src="js/ceremony.js?v=20261021a"></script>
+<script src="js/quiz.js?v=20261021a"></script>
+<script src="js/log.js?v=20261021a"></script>
+<script src="js/app.js?v=20261021a"></script>
 </body>
 </html>

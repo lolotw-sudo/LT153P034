@@ -105,7 +105,7 @@ const UI = (() => {
     const tracks = li.querySelectorAll('.bar-track');
     tracks[2].className = 'bar-track ' + (hasQuiz ? 'bar-z' : 'bar-e');
 
-    tracks[0].title = `實習 ${r.quality}`;
+    tracks[0].title = `作業 ${r.quality}`;
     tracks[1].title = `活躍度 ${r.performance}`;
     tracks[2].title = hasQuiz ? `刷題均分 ${r.quizAvg}（練習 ${r.quizTimes} 次）`
                               : `終極考驗 ${r.exam}`;
@@ -259,7 +259,7 @@ const UI = (() => {
       <div class="pc-section">
         <h4>三項成績</h4>
         <div class="pc-dims">
-          ${dimRow('實習', 'q', r.quality)}
+          ${dimRow('作業', 'q', r.quality)}
           ${hwDetailHTML(r)}
           ${dimRow('活躍度', 'p', r.performance)}
           ${perfNoteHTML(r)}
@@ -286,7 +286,7 @@ const UI = (() => {
       ${perfLogHTML(r)}`;
   }
 
-  /** 三場實習各自幾分；留白的顯示「未評」，代表它還沒被加進累積總分 */
+  /** 兩份作業各自幾分；留白的顯示「未評」，代表它還沒被加進累積總分 */
   function hwDetailHTML(r) {
     if (!r.assignments || !r.assignments.length) return '';
     const items = r.assignments.map(a =>
@@ -351,7 +351,7 @@ const UI = (() => {
     // 第三軸優先畫刷題練習：終極考驗要考完試才有分數，整個學期都是 0，
     // 三角形會塌成一條線。讀不到刷題紀錄時才退回原本的終極考驗。
     const axes = [
-      { label: '實習', value: r.quality,     color: 'var(--q)' },
+      { label: '作業', value: r.quality,     color: 'var(--q)' },
       { label: '活躍度', value: r.performance, color: 'var(--p)' },
       r.quizTimes == null
         ? { label: '終極考驗',  value: r.exam,    color: 'var(--e)' }

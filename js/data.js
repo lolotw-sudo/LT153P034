@@ -17,7 +17,7 @@ const Store = (() => {
     logSheetName: BUILT_IN.logSheetName || '',   // 加減分流水帳的分頁名；留空就不讀
     perfTarget: BUILT_IN.perfTarget || 70,        // 活躍度的「整期滿分目標」加分數
     autoSync: false,
-    // 配分：三項相加＝學期成績滿分。作業那 30 分由三份作業平分。
+    // 配分：三項相加＝學期成績滿分。作業那 30 分由兩份作業平分。
     weights: { ...{ quality: 30, performance: 20, exam: 50 }, ...(BUILT_IN.weights || {}) },
     options: { anim: true, sound: true, blind: false },
     students: [],
@@ -161,7 +161,7 @@ const Scoring = (() => {
 
     // 第三個維度跟能力三角、排位榜、三項成績一致：有刷題資料就用刷題均分，
     // 讀不到才退回終極考驗。終極考驗要考完試才有分數，整季都是 0，
-    // 拿它算「三維均衡」永遠不可能達成（實習 90 幾 − 0）。
+    // 拿它算「三維均衡」永遠不可能達成（作業 90 幾 − 0）。
     const hasQuiz = rows.some(r => r.quizTimes != null);
     const dim3    = r => hasQuiz ? r.quizAvg : r.exam;
     const top3    = Math.max(...rows.map(dim3));
@@ -177,7 +177,7 @@ const Scoring = (() => {
       const b = [];
       const d3 = dim3(r);
       if (r.rank === 1 && prev && prev.champion === r.id) b.push({ icon: '🔥', name: '連霸', desc: '連續兩回合排名第一' });
-      if (r.quality === topQ && topQ > 0)     b.push({ icon: '✨', name: '實習達人', desc: '全班實習成績最高' });
+      if (r.quality === topQ && topQ > 0)     b.push({ icon: '✨', name: '作業達人', desc: '全班作業成績最高' });
       if (r.performance === topP && topP > 0) b.push({ icon: '🙋', name: '課堂之星', desc: '全班活躍度最高' });
       if (d3 === top3 && top3 > 0)
         b.push(hasQuiz ? { icon: '🎯', name: '刷題王', desc: '全班刷題均分最高' }
@@ -278,8 +278,7 @@ const Sheet = (() => {
     avatar:      ['頭像', '圖示', 'avatar', 'emoji', 'icon'],
     hw1:         ['作業1', '作業一', '實習1', 'hw1'],
     hw2:         ['作業2', '作業二', '實習2', 'hw2'],
-    hw3:         ['作業3', '作業三', '實習3', 'hw3'],
-    quality:     ['作業', '品質', 'quality'],   // 沒有作業1~3 時才會用到的單欄舊格式
+    quality:     ['作業', '品質', 'quality'],   // 沒有作業1~2 時才會用到的單欄舊格式
     performance: ['表現', '上課', '活躍', 'performance', 'class'],
     exam:        ['考試', '測驗', '終極', 'exam', 'test', 'score']
   };
@@ -324,7 +323,7 @@ const Sheet = (() => {
     return Math.max(0, Math.min(100, n));
   }
 
-  const HW_LABELS = ['實習1', '實習2', '實習3'];
+  const HW_LABELS = ['作業1', '作業2'];
 
   /** 取座號的比對鍵：「01」「1」「1號」都收斂成 "1"；不是數字就回空字串 */
   function seatKey(v) {
@@ -369,11 +368,11 @@ const Sheet = (() => {
     if (idx.name < 0) throw new Error('找不到「姓名」欄位，請確認第一列有欄位名稱');
 
     // 有「作業1/2/3」就用三欄平均；只有舊的單欄「作業成績」也照樣讀得動
-    const hwIdx = [idx.hw1, idx.hw2, idx.hw3];
+    const hwIdx = [idx.hw1, idx.hw2];
     const hasHw = hwIdx.some(i => i >= 0);
 
     if (!hasHw && idx.quality < 0 && idx.performance < 0 && idx.exam < 0)
-      throw new Error('找不到任何成績欄位（作業1~3 / 上課表現 / 考試成績）');
+      throw new Error('找不到任何成績欄位（作業1~2 / 上課表現 / 考試成績）');
 
     const pick = (r, i) => (i >= 0 ? (r[i] ?? '').trim() : '');
 
@@ -390,7 +389,7 @@ const Sheet = (() => {
       const name = pick(r, idx.name);
       if (!name) return null;
 
-      // 三份作業等權平均。留白＝還沒評分，不列入平均；漏交要明確填 0。
+      // 兩份作業等權平均。留白＝還沒評分，不列入平均；漏交要明確填 0。
       const assignments = hasHw
         ? HW_LABELS.map((label, i) => {
             const raw = pick(r, hwIdx[i]);
@@ -635,7 +634,7 @@ const Sheet = (() => {
     return [...rounds.keys()].sort((a, b) => a - b).map(no => rounds.get(no));
   }
 
-  const TEMPLATE_HEADER = '座號\t姓名\t組別\t單位\t頭像\t實習1\t實習2\t實習3\t考試成績';
+  const TEMPLATE_HEADER = '座號\t姓名\t組別\t單位\t頭像\t作業1\t作業2\t考試成績';
   const LOG_TEMPLATE_HEADER = '日期\t堂次\t學員\t加減分\t事由\t老師';
 
   /** 17 人示範資料，讓沒接試算表時也能立刻看到效果 */

@@ -40,7 +40,7 @@
       a.name.localeCompare(b.name, 'zh-Hant'));
 
     el.innerHTML = `
-      <thead><tr><th>座號</th><th>姓名</th><th>實習</th><th>活躍度</th><th>終極考驗</th><th>學期成績</th></tr></thead>
+      <thead><tr><th>座號</th><th>姓名</th><th>作業</th><th>活躍度</th><th>終極考驗</th><th>學期成績</th></tr></thead>
       <tbody>${list.map(r => `
         <tr>
           <td>${esc(r.seat || '')}</td>
@@ -65,7 +65,7 @@
   function renderWeightMini() {
     const hasQuiz = S().students.some(s => s.quizTimes != null);
     $('#weightMini').innerHTML = `
-      <span><i class="dot dot-q"></i>實習</span>
+      <span><i class="dot dot-q"></i>作業</span>
       <span><i class="dot dot-p"></i>活躍度</span>
       ${hasQuiz ? `<span><i class="dot dot-z"></i>刷題均分</span>`
                 : `<span><i class="dot dot-e"></i>終極考驗</span>`}`;
