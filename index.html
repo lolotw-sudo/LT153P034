@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>客網新進人員訓練班第034期</title>
+<meta name="description" content="客網新進人員訓練班第034期：實習、活躍度、終極考驗依配分即時排位。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+<link rel="stylesheet" href="css/style.css?v=20261020a">
+</head>
+<body>
+
+<canvas id="bgCanvas" aria-hidden="true"></canvas>
+<div class="aurora" aria-hidden="true"></div>
+<div class="grid-floor" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">🏆</span>
+    <div class="brand-text">
+      <h1 id="className">客網新進人員訓練班第034期</h1>
+      <p class="brand-sub"><span id="seasonLabel">賽季進行中</span> · <span id="syncStatus" class="sync-idle">尚未同步</span></p>
+    </div>
+  </div>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab is-active" data-view="solo" role="tab">個人榜</button>
+    <button class="tab" data-view="team" role="tab">公會戰</button>
+    <button class="tab" data-view="log" role="tab">賽季日誌</button>
+    <button class="tab" data-view="quiz" role="tab">刷題</button>
+    <button class="tab" data-view="settings" role="tab">設定</button>
+  </nav>
+
+  <div class="topbar-actions">
+    <button class="btn btn-ghost" id="btnSync" title="從 Google 試算表重新讀取 (R)">
+      <span class="btn-ico">🔄</span><span class="btn-label">同步</span>
+    </button>
+    <button class="btn btn-primary" id="btnCeremony" title="全螢幕頒獎典禮 (C)">
+      <span class="btn-ico">🎬</span><span class="btn-label">頒獎典禮</span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- ══════════ 個人榜 ══════════ -->
+  <section class="view is-active" id="view-solo">
+    <div class="podium" id="podium" aria-label="前三名頒獎台"></div>
+
+    <div class="board-head">
+      <div class="board-title">
+        <h2>排位榜</h2>
+        <span class="chip chip-count" id="rosterCount">0 位學員</span>
+      </div>
+      <div class="weight-mini" id="weightMini"></div>
+    </div>
+
+    <ol class="board" id="board" aria-live="polite"></ol>
+    <p class="board-empty" id="boardEmpty" hidden>尚無資料。到「設定」貼上 Google 試算表連結後按同步。</p>
+  </section>
+
+  <!-- ══════════ 公會戰 ══════════ -->
+  <section class="view" id="view-team">
+    <div class="board-head">
+      <div class="board-title"><h2>公會積分戰</h2><span class="chip" id="teamCount">0 隊</span></div>
+      <p class="hint">公會分數 = 該公會成員的平均得分。在試算表的「組別」欄填上公會名即可自動分組。</p>
+    </div>
+    <div class="team-grid" id="teamGrid"></div>
+    <p class="board-empty" id="teamEmpty" hidden>試算表中沒有「組別」欄位，或所有人都未分組。</p>
+  </section>
+
+  <!-- ══════════ 賽季日誌 ══════════ -->
+  <section class="view" id="view-log">
+    <div class="board-head">
+      <div class="board-title"><h2>賽季日誌</h2></div>
+      <p class="hint">一週一段的班級歷程：那幾天上了什麼、我的側記，還有那一週的學習分析報告。</p>
+      <a class="btn btn-ghost wall-link" id="btnWall" target="_blank" rel="noopener" hidden>
+        <span class="btn-ico">💬</span><span class="btn-label">匿名話牆</span>
+      </a>
+    </div>
+    <div id="logBody"></div>
+  </section>
+
+  <!-- ══════════ 刷題練習 ══════════ -->
+  <section class="view" id="view-quiz">
+    <div class="board-head">
+      <div class="board-title"><h2>刷題練習</h2><span class="chip">每天 3 次</span></div>
+      <p class="hint">隨機抽 10 題。分數不算進學習成績，但每練完一次，互動成績就加分。</p>
+    </div>
+    <div id="quizBody"></div>
+  </section>
+
+  <!-- ══════════ 設定 ══════════ -->
+  <section class="view" id="view-settings">
+
+    <!-- 設定鎖：密碼正確才展開下面的面板 -->
+    <div class="lock" id="settingsLock" hidden>
+      <form class="lock-card" id="lockForm">
+        <div class="lock-ico">🔒</div>
+        <h3>設定已鎖定</h3>
+        <p class="lock-sub">輸入密碼才能修改試算表、成績配分與顯示選項。</p>
+        <input type="password" id="lockInput" placeholder="請輸入密碼"
+               autocomplete="current-password" spellcheck="false">
+        <button class="btn btn-primary" type="submit">解鎖</button>
+        <p class="lock-msg" id="lockMsg"></p>
+      </form>
+    </div>
+
+    <div class="settings-wrap" id="settingsWrap">
+
+      <div class="panel">
+        <h3 class="panel-title">📊 Google 試算表連動</h3>
+        <label class="field">
+          <span class="field-label">試算表連結或 ID</span>
+          <input type="text" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/xxxxxxxx/edit" autocomplete="off" spellcheck="false">
+        </label>
+        <label class="field">
+          <span class="field-label">工作表名稱（分頁名，留空用第一個分頁）</span>
+          <input type="text" id="sheetName" placeholder="成績" autocomplete="off" spellcheck="false">
+        </label>
+        <label class="field">
+          <span class="field-label">加減分紀錄的分頁名（留空＝不使用，活躍度改讀總表欄位）</span>
+          <input type="text" id="logSheetName" placeholder="表現紀錄" autocomplete="off" spellcheck="false">
+        </label>
+        <label class="field">
+          <span class="field-label">活躍度的滿分目標（整期累計加到幾分，就拿滿活躍度的配分）</span>
+          <input type="number" id="perfTarget" min="1" step="1" placeholder="70">
+        </label>
+        <div class="row-actions">
+          <button class="btn btn-primary" id="btnSaveSheet">儲存並同步</button>
+          <label class="switch">
+            <input type="checkbox" id="autoSync">
+            <span>每 60 秒自動同步</span>
+          </label>
+        </div>
+        <div class="callout" id="sheetStatus"></div>
+
+        <details class="howto">
+          <summary>怎麼設定試算表？（點開看步驟）</summary>
+          <ol class="howto-list">
+            <li><b>第一個分頁（學員總表）</b>第一列填欄位名稱：
+              <code>座號 · 姓名 · 組別 · 頭像 · 實習1 · 實習2 · 實習3 · 考試成績</code><br>
+              下面每一列填一位學員，成績填 0–100。<b>還沒評的實習留白</b>（不列入平均），
+              <b>漏交要填 0</b>——兩者意義不同。</li>
+            <li><b>第二個分頁（表現紀錄）</b>記加減分流水帳，第一列填：
+              <code>日期 · 堂次 · 學員 · 加減分 · 事由 · 老師</code><br>
+              上完一堂課就在最底下補幾列，一位學員一列，同一堂課同一人可以記多列。</li>
+            <li><b>把「學員」欄設成下拉選單</b>（強烈建議，不會打錯字）：
+              在總表最右邊加一欄 <code>選單</code>，第二列填
+              <code>=ARRAYFORMULA(IF(B2:B="","",TEXT(A2:A,"00")&amp;" "&amp;B2:B))</code>
+              會自動生出「01 黃相奎」；再到表現紀錄的「學員」欄設
+              資料 → 資料驗證 → 從範圍選取，指向這一欄。<br>
+              帶座號的寫法系統認得，<b>只填座號或只填姓名也都認得</b>。</li>
+            <li>右上角「共用」→ 一般存取權改成「知道連結的任何人」→ 檢視者。</li>
+            <li>把網址列的連結整段貼到上面欄位，按「儲存並同步」。</li>
+          </ol>
+          <div class="row-actions">
+            <button class="btn btn-ghost" id="btnCopyTemplate">複製總表表頭</button>
+            <button class="btn btn-ghost" id="btnCopyLogTemplate">複製表現紀錄表頭</button>
+            <button class="btn btn-ghost" id="btnLoadDemo">載入 17 人示範資料</button>
+          </div>
+        </details>
+      </div>
+
+      <div class="panel">
+        <h3 class="panel-title">⚖️ 學期成績配分</h3>
+        <p class="hint">三項相加就是學期成績的滿分。實習那份由三場實習平分。拉動滑桿，排行榜會當場重新洗牌。</p>
+        <p class="hint" id="weightSum"></p>
+        <div class="weights" id="weights">
+          <div class="weight-row" data-key="quality">
+            <span class="weight-name"><i class="dot dot-q"></i>實習</span>
+            <input type="range" min="0" max="100" step="5" value="30">
+            <output>30 分</output>
+          </div>
+          <div class="weight-row" data-key="performance">
+            <span class="weight-name"><i class="dot dot-p"></i>活躍度</span>
+            <input type="range" min="0" max="100" step="5" value="20">
+            <output>20 分</output>
+          </div>
+          <div class="weight-row" data-key="exam">
+            <span class="weight-name"><i class="dot dot-e"></i>終極考驗</span>
+            <input type="range" min="0" max="100" step="5" value="50">
+            <output>50 分</output>
+          </div>
+        </div>
+        <div class="row-actions">
+          <button class="btn btn-ghost" data-preset="30,20,50">預設</button>
+          <button class="btn btn-ghost" data-preset="35,30,35">均衡</button>
+          <button class="btn btn-ghost" data-preset="20,20,60">考試導向</button>
+          <button class="btn btn-ghost" data-preset="40,30,30">過程導向</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 class="panel-title">📋 學期成績（滿分 100）</h3>
+        <p class="hint">
+          依上面的配分加權算出來的 0–100 分，就是要輸入學習系統的數字。
+          跟排行榜的累積總分是兩套數字：這裡看比重，排行榜看累積量。<b>學生看不到這一頁。</b>
+        </p>
+        <div class="grade-wrap"><table class="grade-table" id="gradeTable"></table></div>
+        <div class="row-actions">
+          <button class="btn btn-ghost" id="btnCopyGrades">複製成績清單</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 class="panel-title">🎛️ 顯示與班級</h3>
+        <label class="field">
+          <span class="field-label">班級名稱</span>
+          <input type="text" id="classNameInput" placeholder="客網新進人員訓練班第034期" autocomplete="off">
+        </label>
+        <div class="toggle-list">
+          <label class="switch"><input type="checkbox" id="optAnim" checked><span>開啟換位與粒子動畫</span></label>
+          <label class="switch"><input type="checkbox" id="optSound" checked><span>頒獎典禮音效</span></label>
+          <label class="switch"><input type="checkbox" id="optBlind"><span>隱藏分數（只顯示名次）</span></label>
+        </div>
+        <div class="row-actions" id="relockRow" hidden>
+          <button class="btn btn-ghost" id="btnRelock">🔒 立刻重新鎖定設定</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 class="panel-title">🗂️ 賽季紀錄</h3>
+        <p class="hint">按「存檔回合」會把全班名次寫進試算表的「回合紀錄」分頁，用來計算進退步與「進步之星」。寫在試算表而不是瀏覽器，所以換裝置、學員手機上看到的都是同一份。建議一週存一次。</p>
+        <div class="row-actions">
+          <button class="btn btn-primary" id="btnSnapshot" title="把全班目前名次存成一個回合，寫進試算表 (S)">
+            <span class="btn-ico">📌</span><span class="btn-label">存檔回合</span>
+          </button>
+        </div>
+        <ul class="snapshot-list" id="snapshotList"></ul>
+        <div class="row-actions">
+          <button class="btn btn-ghost" id="btnExport">匯出備份 JSON</button>
+          <button class="btn btn-ghost" id="btnImport">匯入備份</button>
+          <button class="btn btn-danger" id="btnReset">清除所有本機資料</button>
+          <input type="file" id="importFile" accept=".json,application/json" hidden>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<!-- ══════════ 個人戰績卡 ══════════ -->
+<div class="drawer-scrim" id="drawerScrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-label="個人戰績卡">
+  <button class="drawer-close" id="drawerClose" aria-label="關閉">✕</button>
+  <div class="drawer-body" id="drawerBody"></div>
+</aside>
+
+<!-- ══════════ 頒獎典禮 ══════════ -->
+<div class="ceremony" id="ceremony" hidden>
+  <div class="ceremony-stage">
+    <div class="ceremony-rank" id="cRank"></div>
+    <div class="ceremony-card" id="cCard"></div>
+    <div class="ceremony-hint" id="cHint">按 <kbd>空白鍵</kbd> 揭曉下一位 · <kbd>Esc</kbd> 離開</div>
+  </div>
+  <div class="ceremony-bar">
+    <button class="btn btn-ghost" id="cPrev">← 上一位</button>
+    <button class="btn btn-primary" id="cNext">揭曉下一位 →</button>
+    <button class="btn btn-ghost" id="cAuto">▶ 自動播放</button>
+    <button class="btn btn-ghost" id="cExit">離開</button>
+  </div>
+</div>
+
+<canvas id="fxCanvas" aria-hidden="true"></canvas>
+<div class="toast-stack" id="toasts" aria-live="polite"></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     班級設定 —— 換班級時只要改這裡的試算表 ID
+     試算表必須設為「知道連結的任何人 → 檢視者」，網頁才讀得到
+     ══════════════════════════════════════════════════════════ -->
+<script>
+  window.ARENA_CONFIG = {
+    // https://docs.google.com/spreadsheets/d/【這一段就是 ID】/edit
+    sheetId: '1aO5WitIyYTfxgzR5OSeHSj5ByeAfmzTQq2J-Ov4xxM8',
+    sheetName: '',       // 學員總表的分頁名稱；留空讀第一個分頁
+
+    // 加減分流水帳的分頁名稱；留空就不讀，活躍度改用總表的欄位
+    logSheetName: '表現紀錄',
+    // 活躍度的「整期滿分目標」：累計加到這個分數，就拿滿表現那一項的配分
+    perfTarget: 50,
+
+    // 各項配分，相加＝學期成績滿分。實習那份由三場實習平分。
+    weights: { quality: 30, performance: 20, exam: 50 },
+
+    // ── 賽季日誌 ──
+    // 兩個分頁都是選配的：沒建立就只是那一塊不顯示，不會影響其他功能。
+    logCourseSheet: '課程表',    // 一堂一列：週次 / 日期 / 主題 / 講師 / 側記
+    logReportSheet: '學習報告',  // 一週一列：週次 / 期間 / 重點數據 / 摘要 / 學員回饋 / 成效評估 / 改善方向
+    logAlbumSheet:  '課堂相簿',  // 一張一列：日期 / 檔案ID / 檔名（由 Apps Script 從 Drive 資料夾自動索引）
+
+    // Slido 匿名話牆。留空就不顯示按鈕。
+    // 這是從 Slido 管理介面複製的連結；若要換成給學員的「參與者連結」，
+    // 在 Slido 的 Share → Participant link 複製後貼過來即可。
+    wallUrl: '',
+
+    // ── 刷題練習 ──
+    // 題目與剩餘次數走上面那個 sheetId 的 gviz（跟同步名單同一條路，穩）；
+    // 只有「交卷」會呼叫下面這個 Apps Script 網址。設定步驟見 apps-script/刷題後端.gs
+    quizApi: '',
+    quizBankSheet: '題庫',       // 題庫分頁名
+    quizLogSheet: '刷題紀錄',     // 練習紀錄分頁名
+    quizPoints: 0.5,            // 每練一次加多少互動成績（要跟後端的 POINTS_PER_PRACTICE 一致）
+
+    // ── 回合紀錄 ──
+    // 老師按「存檔回合」時，全班名次寫進這個分頁（走上面那個 quizApi 的後端）。
+    // 分頁由後端第一次存檔時自動建立，不用手動開。
+    snapshotSheet: '回合紀錄',
+
+    // ── 流量統計（Firebase Analytics）──
+    // 到 Firebase 主控台開一個專案 →「新增應用程式 → 網頁」→ 把它給你的
+    // firebaseConfig 那幾行原封不動貼進來，就會開始記錄每個分頁被看幾次。
+    // 全部留空＝完全不啟用，網站照常跑。
+    // 這幾個值本來就會出現在網頁原始碼裡，不是密碼，公開到 GitHub 沒關係。
+    firebase: {
+      apiKey: 'AIzaSyC9w-nomTvq0e3D0QhRq_M_cqTKT_xRrBI',
+      authDomain: 'trainingranking.firebaseapp.com',
+      projectId: 'trainingranking',
+      storageBucket: 'trainingranking.firebasestorage.app',
+      messagingSenderId: '849216330482',
+      appId: '1:849216330482:web:c8708c6f1b42923cda4e6b',
+      measurementId: 'G-FQ9N2P1K78'     // G- 開頭那一個，沒有它就不會有流量數據
+    },
+
+    // 「設定」分頁的密碼，存的是 SHA-256 雜湊而不是明碼。
+    // 要換密碼：README 有算新雜湊的一行指令。設成空字串就完全不上鎖。
+    //
+    // 注意這只是「防手癢」等級的鎖：純前端網站沒有伺服器可以驗證密碼，
+    // 懂開發者工具的人可以繞過。它擋的是共用電腦上有人隨手亂點設定，
+    // 不是真正的存取控制。
+    settingsPasswordHash: '2b214c4a8d1557104833070753dbac814fd089d46c83f0597b3785f6ada8e0ed'
+  };
+</script>
+
+<script src="js/analytics.js?v=20261020a"></script>
+<script src="js/data.js?v=20261020a"></script>
+<script src="js/effects.js?v=20261020a"></script>
+<script src="js/ui.js?v=20261020a"></script>
+<script src="js/ceremony.js?v=20261020a"></script>
+<script src="js/quiz.js?v=20261020a"></script>
+<script src="js/log.js?v=20261020a"></script>
+<script src="js/app.js?v=20261020a"></script>
+</body>
+</html>
