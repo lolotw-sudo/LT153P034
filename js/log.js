@@ -30,6 +30,7 @@ const Log = (() => {
     : s.split(/\r?\n/)).map(t => t.trim()).filter(Boolean);
 
   let cache = null;      // 讀成功就留著，切分頁不重讀
+  let upcoming = '';     // 開訓前：課程表第一堂的日期，日誌空白時用來提示
   let loading = false;
 
   /** 一天先只排一列（桌面剛好滿一列），其餘收進「再看 N 張」 */
@@ -368,8 +369,10 @@ const Log = (() => {
   function render(weeks) {
     const body = $('#logBody');
     if (!weeks.length) {
-      body.innerHTML = `
-        <div class="callout">
+      // 課程表有課、只是都還沒上到 → 是開訓前，不是設定錯
+      body.innerHTML = upcoming
+        ? `<div class="callout">賽季還沒開始。第一堂課（${esc(upcoming)}）上完後，日誌就會從這裡一天一天長出來。</div>`
+        : `<div class="callout">
           還沒讀到「課程表」分頁。到試算表建一個分頁叫 <code>課程表</code>，
           第一列填 <code>週次 · 日期 · 主題 · 講師 · 側記</code>，再按上面的「同步」。
         </div>`;
@@ -448,6 +451,7 @@ const Log = (() => {
     try {
       const [lessons, reports, photos] =
         await Promise.all([fetchLessons(id), fetchReports(id), fetchAlbum(id)]);
+      if (!lessons.length) upcoming = ((await fetchLessons(id, true))[0] || {}).date || '';
       cache = groupByWeek(lessons, reports, photos);
       render(cache);
     } catch (e) {
