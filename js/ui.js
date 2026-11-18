@@ -159,6 +159,7 @@ const UI = (() => {
         const el = pod.querySelector(`.pod[data-place="${i + 1}"]`);
         if (!el) return;
         el.classList.toggle('blind', !!options.blind);
+        el.querySelector('.pod-name').textContent = nm(r.name);   // 解鎖／上鎖時名字要跟著換
         FX.countTo(el.querySelector('.pod-score'), r.total, 1);
       });
       return;
