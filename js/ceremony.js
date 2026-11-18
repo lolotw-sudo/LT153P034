@@ -83,7 +83,7 @@ const Ceremony = (() => {
     card.classList.toggle('is-champion', isChampion);
     card.innerHTML = `
       <div class="cc-avatar">${UI.esc(r.avatar)}</div>
-      <div class="cc-name">${UI.esc(r.name)}</div>
+      <div class="cc-name">${UI.esc(UI.nm(r.name))}</div>
       <div class="cc-meta">
         <span class="tier tier-${r.tier}">${r.tier}</span>
         ${r.team ? `<span class="team-tag">${UI.esc(r.team)}</span>` : ''}

@@ -449,7 +449,7 @@ const Quiz = (() => {
             <button class="quiz-person" data-act="pick" data-name="${esc(s.name)}">
               <span class="quiz-person-ava">${esc(s.avatar || '🙂')}</span>
               <span class="quiz-person-seat">${esc(s.seat || '')}</span>
-              <span class="quiz-person-name">${esc(s.name)}</span>
+              <span class="quiz-person-name">${esc(UI.nm(s.name))}</span>
             </button>`).join('')}
           <button class="quiz-person is-test" data-act="pick" data-name="${esc(TEST_USER.name)}">
             <span class="quiz-person-ava">${TEST_USER.avatar}</span>
@@ -511,7 +511,7 @@ const Quiz = (() => {
     return `
       <div class="quiz-who">
         <span class="quiz-who-ava">${esc(u.avatar || '🙂')}</span>
-        <span class="quiz-who-name">${esc(u.seat ? `${u.seat} ${u.name}` : u.name)}</span>
+        <span class="quiz-who-name">${esc(u.seat ? `${u.seat} ${UI.nm(u.name)}` : UI.nm(u.name))}</span>
         <button class="btn btn-ghost btn-sm" data-act="forget">不是我</button>
       </div>`;
   }

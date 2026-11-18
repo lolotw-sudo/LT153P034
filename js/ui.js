@@ -10,6 +10,21 @@ const UI = (() => {
   const esc = s => String(s).replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+  /* 姓名遮罩：公開網站預設把第二個字換成Ｏ（王Ｏ彬），
+     設定頁用密碼解鎖後（同一個 sessionStorage 旗標）才顯示全名。
+     沒設密碼＝不上鎖，就直接顯示全名。
+     ponytail: 只遮畫面；試算表本身仍公開，要真正保護得在試算表就改用代號。 */
+  const fullNames = () => {
+    if (!(window.ARENA_CONFIG && window.ARENA_CONFIG.settingsPasswordHash)) return true;
+    try { return sessionStorage.getItem('LT153P034.unlocked') === '1'; } catch (e) { return false; }
+  };
+  const nm = n => {
+    const c = [...String(n ?? '')];
+    if (c.length < 2 || fullNames()) return c.join('');
+    c[1] = 'Ｏ';
+    return c.join('');
+  };
+
   let lastChampionId = null;
 
   /* ── 主排行榜 ─────────────────────────────────────── */
@@ -45,7 +60,7 @@ const UI = (() => {
     const champ = rows[0]?.id ?? null;
     if (champ && lastChampionId && champ !== lastChampionId) {
       FX.celebrate();
-      FX.toast(`👑 ${rows[0].name} 登頂了！`, 'ok');
+      FX.toast(`👑 ${nm(rows[0].name)} 登頂了！`, 'ok');
     }
     lastChampionId = champ;
   }
@@ -88,7 +103,7 @@ const UI = (() => {
 
     const streak = r.badges.some(b => b.name === '連霸');
     li.querySelector('.row-name').innerHTML =
-      esc(r.name) + (streak ? ' <span class="streak">🔥</span>' : '');
+      esc(nm(r.name)) + (streak ? ' <span class="streak">🔥</span>' : '');
 
     li.querySelector('.row-meta').innerHTML = [
       `<span class="tier tier-${r.tier}">${r.tier}</span>`,
@@ -154,7 +169,7 @@ const UI = (() => {
       <div class="pod ${options.blind ? 'blind' : ''}" data-place="${i + 1}" data-id="${esc(r.id)}" tabindex="0">
         <span class="pod-crown">${CROWN[i + 1]}</span>
         <div class="pod-avatar">${esc(r.avatar)}</div>
-        <div class="pod-name">${esc(r.name)}</div>
+        <div class="pod-name">${esc(nm(r.name))}</div>
         <div class="pod-score" data-value="0">0</div>
         <div class="pod-place-tag">${PLACE_TAG[i + 1]}</div>
       </div>`).join('');
@@ -187,7 +202,7 @@ const UI = (() => {
         </div>
         <div class="team-bar"><i data-w="${(t.score / max) * 100}"></i></div>
         <div class="team-members">
-          ${t.members.map(m => `<span class="team-member">${esc(m.avatar)} ${esc(m.name)} <b>#${m.rank}</b></span>`).join('')}
+          ${t.members.map(m => `<span class="team-member">${esc(m.avatar)} ${esc(nm(m.name))} <b>#${m.rank}</b></span>`).join('')}
         </div>
       </div>`).join('');
 
@@ -234,7 +249,7 @@ const UI = (() => {
       <div class="pc-head">
         <div class="pc-avatar">${esc(r.avatar)}</div>
         <div>
-          <div class="pc-name">${esc(r.name)}</div>
+          <div class="pc-name">${esc(nm(r.name))}</div>
           <div class="pc-sub">
             <span class="tier tier-${r.tier}">${r.tier}</span>
             ${r.team ? `<span class="team-tag">${esc(r.team)}</span>` : ''}
@@ -456,16 +471,16 @@ const UI = (() => {
     const list = document.getElementById('snapshotList');
     const hist = Store.state.history;
     list.innerHTML = hist.slice().reverse().map(h => {
-      const champName = Store.state.students.find(s => s.id === h.champion)?.name || '—';
+      const champName = Store.state.students.find(s => s.id === h.champion)?.name;
       return `<li>
         <span>${esc(h.label)}</span>
-        <span class="snap-champ">👑 ${esc(champName)}</span>
+        <span class="snap-champ">👑 ${esc(champName ? nm(champName) : '—')}</span>
       </li>`;
     }).join('');
   }
 
   return {
     renderBoard, renderTeams, renderSnapshots,
-    openCard, closeCard, setCardData, esc, $, $$
+    openCard, closeCard, setCardData, esc, nm, $, $$
   };
 })();

@@ -97,7 +97,7 @@
           const { matched, unmatched } = Sheet.applyPerfLog(students, log, st.perfTarget);
           note = `<br>📋 表現紀錄 ${matched} 筆已計入（滿分目標 ${st.perfTarget} 分）。`;
           if (unmatched.length)
-            note += `<br>⚠️ 有 ${unmatched.length} 個名字對不到學員，這些分數<b>沒有被計算</b>：${unmatched.map(esc).join('、')}`;
+            note += `<br>⚠️ 有 ${unmatched.length} 個名字對不到學員，這些分數<b>沒有被計算</b>：${unmatched.map(n => esc(UI.nm(n))).join('、')}`;
         } catch (e) {
           console.warn('[sync] 表現紀錄', e);
           note = `<br>⚠️ 讀不到「${esc(st.logSheetName)}」分頁（${esc(e.message)}）；`
@@ -286,6 +286,7 @@
       else sessionStorage.removeItem(UNLOCK_KEY);
     } catch (e) { /* 無痕模式可能不給寫，忽略 */ }
     applyLockState();
+    refresh();   // 姓名遮罩跟著解鎖狀態切換，畫面要重畫
   }
 
   async function tryUnlock(e) {

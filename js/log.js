@@ -16,7 +16,10 @@
 const Log = (() => {
 
   const $ = sel => document.querySelector(sel);
-  const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
+  // 回饋、側記是自由文字，學員可能自己署名：把名單上的全名一併套遮罩
+  const maskNames = s => (Store.state.students || []).reduce((t, st) =>
+    st.name && st.name.length > 1 ? t.split(st.name).join(UI.nm(st.name)) : t, s);
+  const esc = s => maskNames(String(s ?? '')).replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   const cfg = () => window.ARENA_CONFIG || {};
