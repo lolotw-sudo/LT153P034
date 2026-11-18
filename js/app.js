@@ -285,8 +285,17 @@
       if (on) sessionStorage.setItem(UNLOCK_KEY, '1');
       else sessionStorage.removeItem(UNLOCK_KEY);
     } catch (e) { /* 無痕模式可能不給寫，忽略 */ }
+    if (!on) setFullNames(false);   // 重新上鎖就一併恢復遮名
     applyLockState();
-    refresh();   // 姓名遮罩跟著解鎖狀態切換，畫面要重畫
+  }
+
+  function setFullNames(on) {
+    try {
+      if (on) sessionStorage.setItem(UI.NAMES_KEY, '1');
+      else sessionStorage.removeItem(UI.NAMES_KEY);
+    } catch (e) { /* 無痕模式可能不給寫，忽略 */ }
+    $('#optFullNames').checked = UI.fullNames();
+    refresh();   // 名字遍布各分頁，整個重畫
   }
 
   async function tryUnlock(e) {
@@ -482,6 +491,9 @@
     $('#optSound').addEventListener('change', e => {
       S().options.sound = e.target.checked; Store.save(); FX.setSound(e.target.checked);
     });
+    $('#optFullNames').checked = UI.fullNames();
+    $('#optFullNames').addEventListener('change', e => setFullNames(e.target.checked));
+
     $('#optBlind').addEventListener('change', e => {
       S().options.blind = e.target.checked; Store.save(); refresh();
     });

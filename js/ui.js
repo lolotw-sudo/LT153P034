@@ -10,13 +10,14 @@ const UI = (() => {
   const esc = s => String(s).replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  /* 姓名遮罩：公開網站預設把第二個字換成Ｏ（王Ｏ彬），
-     設定頁用密碼解鎖後（同一個 sessionStorage 旗標）才顯示全名。
+  /* 姓名遮罩：公開網站預設把第二個字換成Ｏ（王Ｏ彬）。
+     設定頁解鎖後，勾「顯示學員全名」才顯示全名；重新鎖定或關掉瀏覽器就恢復遮罩。
      沒設密碼＝不上鎖，就直接顯示全名。
      ponytail: 只遮畫面；試算表本身仍公開，要真正保護得在試算表就改用代號。 */
+  const NAMES_KEY = 'LT153P034.fullNames';
   const fullNames = () => {
     if (!(window.ARENA_CONFIG && window.ARENA_CONFIG.settingsPasswordHash)) return true;
-    try { return sessionStorage.getItem('LT153P034.unlocked') === '1'; } catch (e) { return false; }
+    try { return sessionStorage.getItem(NAMES_KEY) === '1'; } catch (e) { return false; }
   };
   const nm = n => {
     const c = [...String(n ?? '')];
@@ -482,6 +483,6 @@ const UI = (() => {
 
   return {
     renderBoard, renderTeams, renderSnapshots,
-    openCard, closeCard, setCardData, esc, nm, $, $$
+    openCard, closeCard, setCardData, esc, nm, fullNames, NAMES_KEY, $, $$
   };
 })();
