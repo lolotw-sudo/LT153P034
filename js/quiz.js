@@ -511,7 +511,7 @@ const Quiz = (() => {
     return `
       <div class="quiz-who">
         <span class="quiz-who-ava">${esc(u.avatar || '🙂')}</span>
-        <span class="quiz-who-name">${esc(u.seat ? `${u.seat} ${UI.nm(u.name)}` : UI.nm(u.name))}</span>
+        <span class="quiz-who-name">${esc(isTest(u.name) ? u.name : u.seat ? `${u.seat} ${UI.nm(u.name)}` : UI.nm(u.name))}</span>
         <button class="btn btn-ghost btn-sm" data-act="forget">不是我</button>
       </div>`;
   }
