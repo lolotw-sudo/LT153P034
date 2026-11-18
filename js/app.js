@@ -275,7 +275,6 @@
     const locked = lockEnabled() && !unlocked;
     $('#settingsLock').hidden = !locked;
     $('#settingsWrap').hidden = locked;
-    $('#relockRow').hidden = !lockEnabled() || locked;
     if (locked) $('#lockInput').value = '';
   }
 
@@ -514,10 +513,6 @@
     });
 
     $('#lockForm').addEventListener('submit', tryUnlock);
-    $('#btnRelock').addEventListener('click', () => {
-      setUnlocked(false);
-      FX.toast('🔒 設定已重新鎖定');
-    });
 
     $('#drawerClose').addEventListener('click', UI.closeCard);
     $('#drawerScrim').addEventListener('click', UI.closeCard);
