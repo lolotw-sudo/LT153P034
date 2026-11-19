@@ -6,7 +6,7 @@
 <title>客網新進人員訓練班第034期</title>
 <meta name="description" content="客網新進人員訓練班第034期：作業、活躍度、終極考驗依配分即時排位。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
-<link rel="stylesheet" href="css/style.css?v=20261119e">
+<link rel="stylesheet" href="css/style.css?v=20261119f">
 </head>
 <body>
 
@@ -63,6 +63,9 @@
     <div class="board-head">
       <div class="board-title"><h2>課程表</h2></div>
       <p class="hint">整期的課程安排，今天的課會亮起來。</p>
+      <a class="btn btn-ghost wall-link" id="btnHandout" target="_blank" rel="noopener" hidden>
+        <span class="btn-ico">📚</span><span class="btn-label">講義下載</span>
+      </a>
     </div>
     <div id="scheduleBody"></div>
   </section>
@@ -299,6 +302,9 @@
     // 在 Slido 的 Share → Participant link 複製後貼過來即可。
     wallUrl: '',
 
+    // 講義下載的雲端資料夾。留空就不顯示「講義下載」按鈕（在課程表分頁）。
+    handoutUrl: 'https://drive.google.com/drive/folders/16tAM_u1L427WqHBZ4bRhZqieShTLSJF8',
+
     // ── 刷題練習 ──
     // 題目與剩餘次數走上面那個 sheetId 的 gviz（跟同步名單同一條路，穩）；
     // 只有「交卷」會呼叫下面這個 Apps Script 網址。設定步驟見 apps-script/刷題後端.gs
@@ -337,14 +343,14 @@
   };
 </script>
 
-<script src="js/analytics.js?v=20261119e"></script>
-<script src="js/data.js?v=20261119e"></script>
-<script src="js/effects.js?v=20261119e"></script>
-<script src="js/ui.js?v=20261119e"></script>
-<script src="js/ceremony.js?v=20261119e"></script>
-<script src="js/quiz.js?v=20261119e"></script>
-<script src="js/log.js?v=20261119e"></script>
-<script src="js/homework.js?v=20261119e"></script>
-<script src="js/app.js?v=20261119e"></script>
+<script src="js/analytics.js?v=20261119f"></script>
+<script src="js/data.js?v=20261119f"></script>
+<script src="js/effects.js?v=20261119f"></script>
+<script src="js/ui.js?v=20261119f"></script>
+<script src="js/ceremony.js?v=20261119f"></script>
+<script src="js/quiz.js?v=20261119f"></script>
+<script src="js/log.js?v=20261119f"></script>
+<script src="js/homework.js?v=20261119f"></script>
+<script src="js/app.js?v=20261119f"></script>
 </body>
 </html>

@@ -554,6 +554,7 @@
     bindWeights();
     bindEvents();
     Log.initWall();
+    Log.initHandout();
     applyLockState();
     refresh();
     // 開訓前先讓學員看課程表；開訓當天起自動換回個人榜在前

@@ -529,5 +529,14 @@ const Log = (() => {
     btn.hidden = false;
   }
 
-  return { onEnter, load, invalidate, initWall, loadSchedule };
+  /** 講義下載的連結寫在 ARENA_CONFIG.handoutUrl，沒填就不顯示按鈕 */
+  function initHandout() {
+    const url = (cfg().handoutUrl || '').trim();
+    const btn = $('#btnHandout');
+    if (!btn || !url) return;
+    btn.href = url;
+    btn.hidden = false;
+  }
+
+  return { onEnter, load, invalidate, initWall, initHandout, loadSchedule };
 })();
