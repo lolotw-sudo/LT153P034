@@ -15,6 +15,7 @@ const Homework = (() => {
   const KEY_STORE = 'LT153P034.hwKey';   // 老師密碼只記在這個分頁（關掉瀏覽器就忘）
 
   let rows = [];         // [{ name, item, time, file, fileId, score, comment }]
+  let sortBy = 'name';   // 批改表的排序：name＝依姓名、item＝依作業
   let loaded = false;
 
   async function load() {
@@ -124,7 +125,12 @@ const Homework = (() => {
   }
 
   function renderAdmin(box) {
-    const names = (Store.state.students || []).map(s => s.name);
+    const names = (Store.state.students || []).map(s => s.name)
+      .sort((a, b) => a.localeCompare(b, 'zh-Hant'));
+    // 依姓名：同一人的作業1、作業2 排在一起；依作業：先列全班作業1，再列作業2
+    const pairs = sortBy === 'item'
+      ? ITEMS.flatMap(item => names.map(name => [name, item]))
+      : names.flatMap(name => ITEMS.map(item => [name, item]));
     const done = item => rows.filter(r => r.item === item).length;
     let key = '';
     try { key = sessionStorage.getItem(KEY_STORE) || ''; } catch (e) {}
@@ -135,12 +141,19 @@ const Homework = (() => {
           <span class="field-label">老師密碼（評分時後端會核對）</span>
           <input type="password" id="hwKey" value="${esc(key)}" autocomplete="off">
         </label>
+        <label class="field hw-sort">
+          <span class="field-label">排序</span>
+          <select id="hwSort">
+            <option value="name"${sortBy === 'name' ? ' selected' : ''}>依姓名</option>
+            <option value="item"${sortBy === 'item' ? ' selected' : ''}>依作業</option>
+          </select>
+        </label>
         <button class="btn btn-sm" id="hwReload">🔄 重新整理</button>
       </div>
       <p class="hint">${ITEMS.map(i => `${i}：${done(i)} / ${names.length} 人已交`).join('　')}。分數存好後按右上角「同步」，排行榜就會更新。</p>
       <div class="hw-table-wrap"><table class="grade-table hw-table">
         <thead><tr><th>姓名</th><th>作業</th><th>檔案</th><th>分數</th><th>評語</th><th></th></tr></thead>
-        <tbody>${names.flatMap(name => ITEMS.map(item => {
+        <tbody>${pairs.map(([name, item]) => {
           const r = find(name, item);
           if (!r) return `<tr class="hw-none"><td>${esc(name)}</td><td>${item}</td><td colspan="4">未繳交</td></tr>`;
           const link = r.fileId
@@ -154,13 +167,14 @@ const Homework = (() => {
               <td><input type="text" class="hw-cmt" value="${esc(r.comment)}" placeholder="給學員的評語（選填）"></td>
               <td><button class="btn btn-sm btn-primary hw-save">${r.score !== '' ? '更新' : '儲存'}</button></td>
             </tr>`;
-        })).join('')}</tbody>
+        }).join('')}</tbody>
       </table></div>`;
 
     $('#hwKey').addEventListener('change', e => {
       try { sessionStorage.setItem(KEY_STORE, e.target.value); } catch (err) {}
     });
     $('#hwReload').addEventListener('click', mountAdmin);
+    $('#hwSort').addEventListener('change', e => { sortBy = e.target.value; renderAdmin(box); });
     box.querySelectorAll('.hw-save').forEach(btn => btn.addEventListener('click', () => grade(btn)));
   }
 

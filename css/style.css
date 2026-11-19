@@ -1217,3 +1217,6 @@ main {
   background: rgba(255,255,255,.05); border: 1px solid var(--stroke); border-radius: 6px; }
 .hw-table .hw-cmt { min-width: 160px; }
 .hw-none td { color: var(--text-faint); }
+.hw-sort { margin: 0; }
+.hw-sort select { padding: 6px 9px; font: inherit; color: var(--text);
+  background: var(--panel-solid); border: 1px solid var(--stroke); border-radius: 6px; }

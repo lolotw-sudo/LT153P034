@@ -235,7 +235,7 @@ const Sheet = (() => {
     const tab = sheetName ? `&sheet=${encodeURIComponent(sheetName)}` : '';
     const q   = tq ? `&tq=${encodeURIComponent(tq)}` : '';
     const urls = [
-      `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv${tab}${q}`
+      `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=1${tab}${q}`
     ];
     // 「發布到網路」產生的 2PACX- 型 ID 走另一個端點
     if (id.startsWith('2PACX-')) {
