@@ -229,6 +229,7 @@ const UI = (() => {
 
     drawRadar($('#pcRadar'), r);
     drawSparkline($('#pcSpark'), r);
+    if (typeof Homework !== 'undefined') Homework.mount(r.name);
 
     requestAnimationFrame(() => {
       $$('#drawerBody .bar-fill').forEach(f => f.style.width = f.dataset.w + '%');
@@ -265,6 +266,11 @@ const UI = (() => {
         <div class="pc-stat"><b>${r.total.toFixed(1)}</b><span>累積總分</span></div>
         <div class="pc-stat"><b>#${bestRank}</b><span>生涯最佳</span></div>
         <div class="pc-stat"><b>${r.prevRank == null ? '—' : (r.delta > 0 ? '▲' + r.delta : r.delta < 0 ? '▼' + -r.delta : '持平')}</b><span>本回合變化</span></div>
+      </div>
+
+      <div class="pc-section">
+        <h4>📤 交作業</h4>
+        <div id="hwBox"></div>
       </div>
 
       <div class="pc-section">

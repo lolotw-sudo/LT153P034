@@ -56,6 +56,15 @@ const CONFIG = {
   // 但兩張紀錄表都不寫（所以不佔次數、不加分、不污染成績）。
   // 要跟前端 js/quiz.js 的 TEST_USER.name 完全一致。
   TEST_USER: 'LOLO老師',
+
+  // ── 交作業 ──
+  // 老師在網站「設定 → 作業批改」打分數時要輸入的密碼，這裡存的是 SHA-256 雜湊（不存明碼）。
+  // 跟網站設定頁的密碼相同（index.html 的 settingsPasswordHash），兩邊要改就一起改。
+  // 換密碼：終端機 printf '新密碼' | shasum -a 256，把結果貼在這裡。
+  TEACHER_KEY_HASH: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92',
+  HW_TAB: '作業繳交',          // 每人每份作業一列（本檔自動建立）
+  HW_ITEMS: ['作業1', '作業2'], // 要跟學員總表的欄位名稱一致，分數會寫進那一欄
+  HW_MAX_MB: 20,              // 單一檔案上限
 };
 
 const LOG_HEADER  = ['時間', '日期', '座號', '姓名', '科目', '得分', '答對', '題數', '用時(秒)', '今日第幾次', '回合編號'];
@@ -93,6 +102,8 @@ function doPost(e) {
     const body = JSON.parse((e && e.postData && e.postData.contents) || '{}');
     if (body.action === 'submit')   return json(submitRound(body));
     if (body.action === 'snapshot') return json(saveSnapshot(body));
+    if (body.action === 'hwSubmit') return json(submitHomework(body));
+    if (body.action === 'hwGrade')  return json(gradeHomework(body));
     return json({ ok: false, error: '不認得的 action' });
   } catch (err) {
     return json({ ok: false, error: String(err && err.message || err) });
@@ -557,4 +568,146 @@ function selfTest() {
   Logger.log('（這筆測試紀錄會留在「%s」與「%s」分頁，記得手動刪掉）',
              CONFIG.LOG_TAB, CONFIG.PERF_TAB);
   return res;
+}
+
+
+/* ══════════ 交作業 ══════════════════════════════════════
+ * 檔案存進老師 Drive 的「<試算表名>｜作業繳交」資料夾（第一次交作業時自動建立，
+ * 不公開，只有老師打得開）；繳交紀錄與分數寫在「作業繳交」分頁，網站用 gviz 讀。
+ */
+const HW_HEADER = ['姓名', '作業', '繳交時間', '檔名', '檔案ID', '分數', '評語', '評分時間'];
+
+function hwFolder() {
+  const props = PropertiesService.getScriptProperties();
+  const id = props.getProperty('HW_FOLDER_ID');
+  if (id) {
+    try { return DriveApp.getFolderById(id); } catch (e) { /* 被刪了就重建 */ }
+  }
+  const folder = DriveApp.createFolder(SpreadsheetApp.getActiveSpreadsheet().getName() + '｜作業繳交');
+  props.setProperty('HW_FOLDER_ID', folder.getId());
+  return folder;
+}
+
+/** 學員的檔名、老師的評語開頭是 = + - @ 時，試算表會當成公式執行 —— 前面加 ' 讓它保持文字 */
+const asText = v => /^[=+\-@]/.test(String(v)) ? "'" + v : String(v);
+
+/** 整列先設成純文字再寫，時間才不會被試算表自動轉成日期格式 */
+function hwWrite(sh, row, values) {
+  const range = sh.getRange(row, 1, 1, HW_HEADER.length);
+  range.setNumberFormat('@');
+  range.setValues([values.map(asText)]);
+}
+
+/** 密碼連錯 10 次就鎖 1 小時，擋住一直亂猜 */
+function checkTeacherKey(key) {
+  const cache = CacheService.getScriptCache();
+  const fails = Number(cache.get('hwKeyFails') || 0);
+  if (fails >= 10) throw new Error('密碼錯太多次，請 1 小時後再試');
+  const hex = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(key || ''), Utilities.Charset.UTF_8)
+    .map(b => ('0' + (b & 0xff).toString(16)).slice(-2)).join('');
+  if (hex !== CONFIG.TEACHER_KEY_HASH) {
+    cache.put('hwKeyFails', String(fails + 1), 3600);
+    throw new Error('老師密碼不對');
+  }
+}
+
+/** 這個人這份作業在第幾列；沒交過回 0 */
+function hwRowOf(sh, name, item) {
+  const last = sh.getLastRow();
+  if (last < 2) return 0;
+  const v = sh.getRange(2, 1, last - 1, 2).getValues();
+  for (let i = 0; i < v.length; i++) {
+    if (String(v[i][0]).trim() === name && String(v[i][1]).trim() === item) return i + 2;
+  }
+  return 0;
+}
+
+function hwCheck(body) {
+  const name = String(body.name || '').trim(), item = String(body.item || '').trim();
+  // 名單不走快取：名單剛換過時，快取裡可能還是舊名字
+  if (!name || readRosterRaw().indexOf(name) < 0) throw new Error('名單裡找不到這位學員');
+  if (CONFIG.HW_ITEMS.indexOf(item) < 0) throw new Error('不認得的作業項目');
+  return { name, item };
+}
+
+/** 學員交作業：評分前可以重交，以最後一次為準 */
+function submitHomework(body) {
+  const { name, item } = hwCheck(body);
+  const original = String(body.fileName || '未命名').trim();
+  if (!body.data) return { ok: false, error: '沒有收到檔案' };
+
+  const bytes = Utilities.base64Decode(String(body.data));
+  if (bytes.length > CONFIG.HW_MAX_MB * 1024 * 1024)
+    return { ok: false, error: `檔案超過 ${CONFIG.HW_MAX_MB} MB` };
+
+  // 存大檔很花時間，放在鎖外面做 —— 不然有人傳 20 MB 時，全班刷題交卷都會卡住
+  const file = hwFolder().createFile(
+    Utilities.newBlob(bytes, body.mimeType || 'application/octet-stream', `${item}_${name}_${original}`));
+  const trash = id => { try { DriveApp.getFileById(id).setTrashed(true); } catch (e) {} };
+
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(20000)) { trash(file.getId()); return { ok: false, error: '系統忙碌中，請 3 秒後再按一次' }; }
+  try {
+    const sh = tabOf(SpreadsheetApp.getActiveSpreadsheet(), CONFIG.HW_TAB, HW_HEADER);
+    const row = hwRowOf(sh, name, item);
+    if (row && String(sh.getRange(row, 6).getValue()) !== '') {
+      trash(file.getId());
+      return { ok: false, error: '這份作業老師已經評分，不能再重交' };
+    }
+
+    const now = Utilities.formatDate(new Date(), CONFIG.TZ, 'yyyy-MM-dd HH:mm');
+    // 重交：舊版丟垃圾桶（30 天內可從 Drive 救回），試算表只記最新一份
+    if (row) trash(String(sh.getRange(row, 5).getValue()));
+    hwWrite(sh, row || sh.getLastRow() + 1, [name, item, now, original, file.getId(), '', '', '']);
+    return { ok: true, name, item, time: now, fileName: original };
+  } catch (e) {
+    trash(file.getId());
+    throw e;
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** 老師評分：分數同時寫進學員總表對應的作業欄，排行榜同步後就會更新 */
+function gradeHomework(body) {
+  checkTeacherKey(body.key);
+  const { name, item } = hwCheck(body);
+  const score = Number(body.score);
+  if (String(body.score).trim() === '' || !isFinite(score) || score < 0 || score > 100)
+    return { ok: false, error: '分數要填 0～100' };
+  const comment = String(body.comment || '').trim();
+
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(20000)) return { ok: false, error: '系統忙碌中，請 3 秒後再按一次' };
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sh = tabOf(ss, CONFIG.HW_TAB, HW_HEADER);
+    const row = hwRowOf(sh, name, item);
+    if (!row) return { ok: false, error: '這位學員還沒交這份作業' };
+
+    // 先確認學員總表寫得進去，兩邊才一起寫 —— 不會出現「繳交分頁有分數、總表沒有」
+    const roster = CONFIG.ROSTER_TAB ? ss.getSheetByName(CONFIG.ROSTER_TAB) : ss.getSheets()[0];
+    const values = roster.getDataRange().getValues();
+    const nameCol = indexOf(values[0], ['姓名', '學員', '名字']);
+    const itemCol = indexOf(values[0], [item]);
+    if (nameCol < 0 || itemCol < 0) return { ok: false, error: `學員總表找不到「姓名」或「${item}」欄` };
+    const r = values.findIndex((v, i) => i > 0 && String(v[nameCol]).trim() === name);
+    if (r < 0) return { ok: false, error: '學員總表找不到這位學員' };
+
+    const now = Utilities.formatDate(new Date(), CONFIG.TZ, 'yyyy-MM-dd HH:mm');
+    const cur = sh.getRange(row, 1, 1, HW_HEADER.length).getDisplayValues()[0];
+    hwWrite(sh, row, [...cur.slice(0, 5), score, comment, now]);
+    roster.getRange(r + 1, itemCol + 1).setValue(score);
+
+    return { ok: true, name, item, score, comment, gradedAt: now };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** 第一次加上交作業功能時執行一次：觸發 Drive 授權、建好資料夾與分頁 */
+function setupHomework() {
+  const folder = hwFolder();
+  tabOf(SpreadsheetApp.getActiveSpreadsheet(), CONFIG.HW_TAB, HW_HEADER);
+  Logger.log('✅ 作業資料夾：%s', folder.getUrl());
 }

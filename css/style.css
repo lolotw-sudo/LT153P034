@@ -1194,3 +1194,26 @@ main {
   .rp-overall .rp-stat { flex: 1 1 40%; }   /* 總評卡片較多，手機上排兩欄 */
   .lg-day { padding-left: 16px; }
 }
+
+/* ── 交作業／作業批改 ───────────────────────────────── */
+.hw-item { padding: 10px 0; border-bottom: 1px solid var(--stroke); }
+.hw-item:last-of-type { border-bottom: 0; }
+.hw-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.hw-st { font-size: 12px; padding: 2px 9px; border-radius: 999px; color: var(--text-dim); background: rgba(255,255,255,.06); }
+.hw-st.wait { color: var(--cyan); }
+.hw-st.ok { color: var(--up); }
+.hw-comment { margin: 6px 0 0; padding: 8px 11px; font-size: 13px; line-height: 1.6;
+  border-radius: var(--r-sm); background: rgba(255,255,255,.04); border: 1px solid var(--stroke); }
+.hw-upload { display: inline-block; margin-top: 6px; cursor: pointer; }
+.hw-upload input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.hw-upload input:focus-visible + .btn { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.hw-panel { grid-column: 1 / -1; }
+.hw-key { flex: 1; max-width: 260px; margin: 0; }
+.hw-table-wrap { overflow-x: auto; }
+.hw-table td { vertical-align: middle; text-align: left !important; white-space: normal; }
+.hw-table a { color: var(--cyan); }
+.hw-table small { color: var(--text-faint); }
+.hw-table input { width: 100%; min-width: 60px; padding: 5px 7px; font: inherit; color: var(--text);
+  background: rgba(255,255,255,.05); border: 1px solid var(--stroke); border-radius: 6px; }
+.hw-table .hw-cmt { min-width: 160px; }
+.hw-none td { color: var(--text-faint); }

@@ -138,6 +138,7 @@
       Store.set({ students, history, lastSync: Date.now() });
       refresh();
       Log.invalidate();
+      Homework.invalidate();
       setSyncStatus(`已同步 ${timeStr(Date.now())}`, 'sync-ok');
       setSheetStatus(`✅ 讀到 ${students.length} 位學員。${note}`, note.includes('⚠️') ? '' : 'ok');
       if (!silent) FX.toast(`已從試算表讀入 ${students.length} 位學員`, 'ok');
@@ -246,7 +247,7 @@
   function switchView(name) {
     $$('.tab').forEach(t => t.classList.toggle('is-active', t.dataset.view === name));
     $$('.view').forEach(v => v.classList.toggle('is-active', v.id === `view-${name}`));
-    if (name === 'settings') applyLockState();
+    if (name === 'settings') { applyLockState(); Homework.mountAdmin(); }
     if (name === 'quiz') Quiz.onEnter();
     if (name === 'log') Log.onEnter();
     if (name === 'schedule') Log.loadSchedule();
