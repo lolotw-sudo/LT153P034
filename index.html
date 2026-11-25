@@ -6,7 +6,7 @@
 <title>客網新進人員訓練班第034期</title>
 <meta name="description" content="客網新進人員訓練班第034期：作業、活躍度、終極考驗依配分即時排位。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
-<link rel="stylesheet" href="css/style.css?v=20261125b">
+<link rel="stylesheet" href="css/style.css?v=20261125c">
 </head>
 <body>
 
@@ -130,6 +130,61 @@
       </div>
 
       <div class="panel">
+        <h3 class="panel-title">🎛️ 顯示與班級</h3>
+        <label class="field">
+          <span class="field-label">班級名稱</span>
+          <input type="text" id="classNameInput" placeholder="客網新進人員訓練班第034期" autocomplete="off">
+        </label>
+        <div class="toggle-list">
+          <label class="switch"><input type="checkbox" id="optAnim" checked><span>開啟換位與粒子動畫</span></label>
+          <label class="switch"><input type="checkbox" id="optSound" checked><span>頒獎典禮音效</span></label>
+          <label class="switch"><input type="checkbox" id="optBlind"><span>隱藏分數（只顯示名次）</span></label>
+          <label class="switch"><input type="checkbox" id="optFullNames"><span>顯示學員全名（關掉瀏覽器後，自動恢復遮住第二個字）</span></label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 class="panel-title">⚖️ 學期成績配分</h3>
+        <p class="hint">三項相加就是學期成績的滿分。作業那份由兩份作業平分。拉動滑桿，排行榜會當場重新洗牌。</p>
+        <p class="hint" id="weightSum"></p>
+        <div class="weights" id="weights">
+          <div class="weight-row" data-key="quality">
+            <span class="weight-name"><i class="dot dot-q"></i>作業</span>
+            <input type="range" min="0" max="100" step="5" value="30">
+            <output>30 分</output>
+          </div>
+          <div class="weight-row" data-key="performance">
+            <span class="weight-name"><i class="dot dot-p"></i>活躍度</span>
+            <input type="range" min="0" max="100" step="5" value="20">
+            <output>20 分</output>
+          </div>
+          <div class="weight-row" data-key="exam">
+            <span class="weight-name"><i class="dot dot-e"></i>終極考驗</span>
+            <input type="range" min="0" max="100" step="5" value="50">
+            <output>50 分</output>
+          </div>
+        </div>
+        <div class="row-actions">
+          <button class="btn btn-ghost" data-preset="30,20,50">預設</button>
+          <button class="btn btn-ghost" data-preset="35,30,35">均衡</button>
+          <button class="btn btn-ghost" data-preset="20,20,60">考試導向</button>
+          <button class="btn btn-ghost" data-preset="40,30,30">過程導向</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 class="panel-title">📋 學期成績（滿分 100）</h3>
+        <p class="hint">
+          依上面的配分加權算出來的 0–100 分，就是要輸入學習系統的數字。
+          跟排行榜的累積總分是兩套數字：這裡看比重，排行榜看累積量。<b>學生看不到這一頁。</b>
+        </p>
+        <div class="grade-wrap"><table class="grade-table" id="gradeTable"></table></div>
+        <div class="row-actions">
+          <button class="btn btn-ghost" id="btnCopyGrades">複製成績清單</button>
+        </div>
+      </div>
+
+      <div class="panel">
         <h3 class="panel-title">📊 Google 試算表連動</h3>
         <label class="field">
           <span class="field-label">試算表連結或 ID</span>
@@ -181,61 +236,6 @@
             <button class="btn btn-ghost" id="btnLoadDemo">載入 17 人示範資料</button>
           </div>
         </details>
-      </div>
-
-      <div class="panel">
-        <h3 class="panel-title">⚖️ 學期成績配分</h3>
-        <p class="hint">三項相加就是學期成績的滿分。作業那份由兩份作業平分。拉動滑桿，排行榜會當場重新洗牌。</p>
-        <p class="hint" id="weightSum"></p>
-        <div class="weights" id="weights">
-          <div class="weight-row" data-key="quality">
-            <span class="weight-name"><i class="dot dot-q"></i>作業</span>
-            <input type="range" min="0" max="100" step="5" value="30">
-            <output>30 分</output>
-          </div>
-          <div class="weight-row" data-key="performance">
-            <span class="weight-name"><i class="dot dot-p"></i>活躍度</span>
-            <input type="range" min="0" max="100" step="5" value="20">
-            <output>20 分</output>
-          </div>
-          <div class="weight-row" data-key="exam">
-            <span class="weight-name"><i class="dot dot-e"></i>終極考驗</span>
-            <input type="range" min="0" max="100" step="5" value="50">
-            <output>50 分</output>
-          </div>
-        </div>
-        <div class="row-actions">
-          <button class="btn btn-ghost" data-preset="30,20,50">預設</button>
-          <button class="btn btn-ghost" data-preset="35,30,35">均衡</button>
-          <button class="btn btn-ghost" data-preset="20,20,60">考試導向</button>
-          <button class="btn btn-ghost" data-preset="40,30,30">過程導向</button>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h3 class="panel-title">📋 學期成績（滿分 100）</h3>
-        <p class="hint">
-          依上面的配分加權算出來的 0–100 分，就是要輸入學習系統的數字。
-          跟排行榜的累積總分是兩套數字：這裡看比重，排行榜看累積量。<b>學生看不到這一頁。</b>
-        </p>
-        <div class="grade-wrap"><table class="grade-table" id="gradeTable"></table></div>
-        <div class="row-actions">
-          <button class="btn btn-ghost" id="btnCopyGrades">複製成績清單</button>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h3 class="panel-title">🎛️ 顯示與班級</h3>
-        <label class="field">
-          <span class="field-label">班級名稱</span>
-          <input type="text" id="classNameInput" placeholder="客網新進人員訓練班第034期" autocomplete="off">
-        </label>
-        <div class="toggle-list">
-          <label class="switch"><input type="checkbox" id="optAnim" checked><span>開啟換位與粒子動畫</span></label>
-          <label class="switch"><input type="checkbox" id="optSound" checked><span>頒獎典禮音效</span></label>
-          <label class="switch"><input type="checkbox" id="optBlind"><span>隱藏分數（只顯示名次）</span></label>
-          <label class="switch"><input type="checkbox" id="optFullNames"><span>顯示學員全名（關掉瀏覽器後，自動恢復遮住第二個字）</span></label>
-        </div>
       </div>
 
       <div class="panel">
@@ -358,14 +358,14 @@
   };
 </script>
 
-<script src="js/analytics.js?v=20261125b"></script>
-<script src="js/data.js?v=20261125b"></script>
-<script src="js/effects.js?v=20261125b"></script>
-<script src="js/ui.js?v=20261125b"></script>
-<script src="js/ceremony.js?v=20261125b"></script>
-<script src="js/quiz.js?v=20261125b"></script>
-<script src="js/log.js?v=20261125b"></script>
-<script src="js/homework.js?v=20261125b"></script>
-<script src="js/app.js?v=20261125b"></script>
+<script src="js/analytics.js?v=20261125c"></script>
+<script src="js/data.js?v=20261125c"></script>
+<script src="js/effects.js?v=20261125c"></script>
+<script src="js/ui.js?v=20261125c"></script>
+<script src="js/ceremony.js?v=20261125c"></script>
+<script src="js/quiz.js?v=20261125c"></script>
+<script src="js/log.js?v=20261125c"></script>
+<script src="js/homework.js?v=20261125c"></script>
+<script src="js/app.js?v=20261125c"></script>
 </body>
 </html>
