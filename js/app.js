@@ -247,7 +247,7 @@
   function switchView(name) {
     $$('.tab').forEach(t => t.classList.toggle('is-active', t.dataset.view === name));
     $$('.view').forEach(v => v.classList.toggle('is-active', v.id === `view-${name}`));
-    if (name === 'settings') { applyLockState(); Homework.mountAdmin(); }
+    if (name === 'settings') { applyLockState(); if ($('#hwPanel').open) Homework.mountAdmin(); }
     if (name === 'quiz') Quiz.onEnter();
     if (name === 'log') Log.onEnter();
     if (name === 'schedule') Log.loadSchedule();

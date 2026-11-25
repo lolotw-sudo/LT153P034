@@ -6,7 +6,7 @@
 <title>客網新進人員訓練班第034期</title>
 <meta name="description" content="客網新進人員訓練班第034期：作業、活躍度、終極考驗依配分即時排位。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
-<link rel="stylesheet" href="css/style.css?v=20261125a">
+<link rel="stylesheet" href="css/style.css?v=20261125b">
 </head>
 <body>
 
@@ -109,18 +109,23 @@
 
     <div class="settings-wrap" id="settingsWrap">
 
-      <div class="panel hw-panel">
-        <h3 class="panel-title">📝 作業批改</h3>
+      <!-- 預設收合：點標題才展開，展開時才去讀繳交紀錄 -->
+      <details class="panel hw-panel" id="hwPanel">
+        <summary class="panel-title">📝 作業批改</summary>
         <div id="hwAdmin"></div>
-      </div>
+      </details>
 
       <div class="panel">
-        <h3 class="panel-title">📷 課堂照片上傳</h3>
-        <p class="hint">課堂照片傳到這個雲端資料夾，最多 1 小時就會自動出現在「賽季日誌」對應的那堂課底下。<br>
-          請用手機相簿直接上傳（會保留拍攝時間）；注意不要傳到名稱很像的「作業繳交」資料夾。</p>
+        <h3 class="panel-title">📁 雲端資料夾</h3>
+        <p class="hint"><b>課堂相簿</b>：課堂照片傳到這裡，最多 1 小時就會自動出現在「賽季日誌」對應的那堂課底下。
+          請用手機相簿直接上傳（會保留拍攝時間）。</p>
+        <p class="hint"><b>作業繳交</b>：學員從網站交的作業都存在這裡，檔名開頭是「作業1_姓名_」。
+          只放學員作業，課堂照片不要傳到這裡。</p>
         <div class="row-actions">
           <a class="btn btn-primary" href="https://drive.google.com/drive/folders/1fxUjI6Mre3hM_i7m8FQIXxZAWcvFHcTz"
              target="_blank" rel="noopener">打開課堂相簿資料夾</a>
+          <a class="btn" href="https://drive.google.com/drive/folders/1ObHXh43WByWDzdkqXPldP92JLVPI5onW"
+             target="_blank" rel="noopener">打開作業繳交資料夾</a>
         </div>
       </div>
 
@@ -353,14 +358,14 @@
   };
 </script>
 
-<script src="js/analytics.js?v=20261125a"></script>
-<script src="js/data.js?v=20261125a"></script>
-<script src="js/effects.js?v=20261125a"></script>
-<script src="js/ui.js?v=20261125a"></script>
-<script src="js/ceremony.js?v=20261125a"></script>
-<script src="js/quiz.js?v=20261125a"></script>
-<script src="js/log.js?v=20261125a"></script>
-<script src="js/homework.js?v=20261125a"></script>
-<script src="js/app.js?v=20261125a"></script>
+<script src="js/analytics.js?v=20261125b"></script>
+<script src="js/data.js?v=20261125b"></script>
+<script src="js/effects.js?v=20261125b"></script>
+<script src="js/ui.js?v=20261125b"></script>
+<script src="js/ceremony.js?v=20261125b"></script>
+<script src="js/quiz.js?v=20261125b"></script>
+<script src="js/log.js?v=20261125b"></script>
+<script src="js/homework.js?v=20261125b"></script>
+<script src="js/app.js?v=20261125b"></script>
 </body>
 </html>

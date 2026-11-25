@@ -1220,3 +1220,10 @@ main {
 .hw-sort { margin: 0; }
 .hw-sort select { padding: 6px 9px; font: inherit; color: var(--text);
   background: var(--panel-solid); border: 1px solid var(--stroke); border-radius: 6px; }
+
+/* 作業批改：可收合的面板 */
+.hw-panel > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; margin-bottom: 0; }
+.hw-panel > summary::-webkit-details-marker { display: none; }
+.hw-panel > summary::after { content: '展開'; margin-left: auto; font-size: 12px; color: var(--text-dim); }
+.hw-panel[open] > summary { margin-bottom: 14px; }
+.hw-panel[open] > summary::after { content: '收合'; }

@@ -205,5 +205,8 @@ const Homework = (() => {
   /** 按「同步」時下次重讀 */
   function invalidate() { loaded = false; }
 
+  // 作業批改面板預設收合，展開那一刻才讀繳交紀錄
+  document.getElementById('hwPanel')?.addEventListener('toggle', e => { if (e.target.open) mountAdmin(); });
+
   return { mount, mountAdmin, invalidate };
 })();
